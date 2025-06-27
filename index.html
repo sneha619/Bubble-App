@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bubbles App</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .browser-window {
+            background: #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            width: 90vw;
+            max-width: 800px;
+            min-height: 600px;
+        }
+        
+        .browser-header {
+            background: #d0d0d0;
+            padding: 10px 15px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #bbb;
+        }
+        
+        .browser-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .browser-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 1px solid #999;
+        }
+        
+        .close { background: #ff5f57; }
+        .minimize { background: #ffbd2e; }
+        .maximize { background: #28ca42; }
+        
+        .address-bar {
+            flex: 1;
+            background: white;
+            border: 1px solid #999;
+            border-radius: 3px;
+            padding: 4px 8px;
+            margin: 0 10px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .browser-content {
+            background: white;
+            padding: 20px;
+            text-align: center;
+            min-height: 500px;
+        }
+        
+        h1 {
+            margin: 0 0 30px 0;
+            font-size: 24px;
+            color: #333;
+        }
+        
+        .app-container {
+            border: 2px solid #333;
+            background: white;
+            margin: 0 auto 20px auto;
+            position: relative;
+            width: 90%;
+            max-width: 600px;
+            height: 400px;
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+        
+        .reset-button {
+            background: #f0f0f0;
+            border: 2px solid #999;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+        
+        .reset-button:hover {
+            background: #e0e0e0;
+        }
+        
+        .reset-button:active {
+            background: #d0d0d0;
+        }
+        
+        .nav-button, .search-button {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .browser-window {
+                width: 95vw;
+            }
+            
+            .app-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="browser-window">
+        <div class="browser-header">
+            <div class="browser-buttons">
+                <div class="browser-button close"></div>
+                <div class="browser-button minimize"></div>
+                <div class="browser-button maximize"></div>
+            </div>
+            <div class="nav-button">🏠</div>
+            <input type="text" class="address-bar" value="https://localhost:80" readonly>
+            <div class="search-button">🔍</div>
+        </div>
+        
+        <div class="browser-content">
+            <h1>Bubbles App</h1>
+            <div class="app-container">
+                <canvas id="bubblesCanvas"></canvas>
+                <button class="reset-button" id="resetBtn">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Wait for the DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get canvas element and context
+            const canvas = document.getElementById('bubblesCanvas');
+            const ctx = canvas.getContext('2d');
+            const resetBtn = document.getElementById('resetBtn');
+            
+            // Set canvas dimensions
+            function resizeCanvas() {
+                const container = canvas.parentElement;
+                canvas.width = container.clientWidth;
+                canvas.height = container.clientHeight;
+                // Only call draw if all required arrays are defined
+                if (typeof circles !== 'undefined' && typeof arrows !== 'undefined' && typeof particles !== 'undefined') {
+                    draw();
+                }
+            }
+            
+            // Add resize event listener
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Define circles
+            const circles = [
+                { x: 80, y: 80, radius: 30, originalRadius: 30, color: '#FFD700', originalColor: '#FFD700', clicked: false, pulsing: false, pulseValue: 0 },
+                { x: 80, y: 150, radius: 30, originalRadius: 30, color: '#4169E1', originalColor: '#4169E1', clicked: false, pulsing: false, pulseValue: 0 },
+                { x: 80, y: 220, radius: 30, originalRadius: 30, color: '#DC143C', originalColor: '#DC143C', clicked: false, pulsing: false, pulseValue: 0 },
+                { x: 80, y: 290, radius: 30, originalRadius: 30, color: '#32CD32', originalColor: '#32CD32', clicked: false, pulsing: false, pulseValue: 0 }
+            ];
+            
+            // Define arrows
+            let arrows = [];
+            
+            function updateArrows() {
+                arrows = [
+                    { x: circles[0].x + circles[0].radius + 30, y: circles[0].y, targetX: circles[0].x + circles[0].radius + 30, originalX: circles[0].x + circles[0].radius + 30, moving: false, circleIndex: 0, direction: 1 },
+                    { x: circles[1].x + circles[1].radius + 30, y: circles[1].y, targetX: circles[1].x + circles[1].radius + 30, originalX: circles[1].x + circles[1].radius + 30, moving: false, circleIndex: 1, direction: 1 },
+                    { x: circles[2].x + circles[2].radius + 30, y: circles[2].y, targetX: circles[2].x + circles[2].radius + 30, originalX: circles[2].x + circles[2].radius + 30, moving: false, circleIndex: 2, direction: 1 },
+                    { x: circles[3].x + circles[3].radius + 30, y: circles[3].y, targetX: circles[3].x + circles[3].radius + 30, originalX: circles[3].x + circles[3].radius + 30, moving: false, circleIndex: 3, direction: 1 }
+                ];
+            }
+            
+            // Particle effect system
+            let particles = [];
+            
+            updateArrows();
+            
+            // Call resize initially after arrays are defined
+            resizeCanvas();
+            
+            // Draw function
+            function draw() {
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw circles
+                circles.forEach(circle => {
+                    drawCircle(circle.x, circle.y, circle.radius, circle.color);
+                });
+                
+                // Draw arrows
+                arrows.forEach(arrow => {
+                    drawArrow(arrow.x, arrow.y);
+                });
+                
+                // Draw particles
+                particles.forEach(particle => {
+                    drawParticle(particle);
+                });
+            }
+            
+            // Draw circle
+            function drawCircle(x, y, radius, color) {
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, 2 * Math.PI);
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            
+            // Draw arrow (previous arrow symbol ←)
+            function drawArrow(x, y) {
+                const arrowSize = 30; // Increased size of the arrow symbol
+                
+                // Set text properties
+                ctx.font = `bold ${arrowSize}px Arial`;
+                ctx.fillStyle = '#000'; // Darker color for better visibility
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // Draw the arrow symbol (←)
+                ctx.fillText('←', x, y);
+                
+                // Add a thicker line
+                ctx.beginPath();
+                ctx.moveTo(x + 15, y);
+                ctx.lineTo(x - 15, y);
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 3; // Thicker line
+                ctx.stroke();
+            }
+            
+            // Draw particle
+            function drawParticle(particle) {
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.size, 0, 2 * Math.PI);
+                ctx.fillStyle = particle.color;
+                ctx.globalAlpha = particle.life / 50; // Fade out as life decreases
+                ctx.fill();
+                ctx.globalAlpha = 1.0; // Reset alpha
+            }
+            
+            // Handle canvas click with event delegation
+            function handleCanvasClick(e) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Check if click is on any interactive element
+                let elementClicked = false;
+                
+                // Check if click is on any circle
+                for (let i = 0; i < circles.length; i++) {
+                    const circle = circles[i];
+                    const distance = Math.sqrt((x - circle.x) ** 2 + (y - circle.y) ** 2);
+                    if (distance <= circle.radius) {
+                        handleCircleClick(i);
+                        elementClicked = true;
+                        break; // Only handle one click at a time
+                    }
+                }
+                
+                // Check if click is on reset button (if needed)
+                // This is handled separately by the button's own event listener
+                
+                return elementClicked;
+            }
+            
+            // Add single event listener for all canvas interactions
+            canvas.addEventListener('click', handleCanvasClick);
+            
+            // Handle circle click
+            function handleCircleClick(circleIndex) {
+                const circle = circles[circleIndex];
+                const arrow = arrows[circleIndex];
+                
+                if (!circle.clicked) {
+                    // First click - start arrow movement
+                    circle.clicked = true;
+                    arrow.moving = true;
+                    arrow.targetX = circle.x + circle.radius; // Move arrow to the rightmost point of the circle
+                    arrow.direction = 'forward'; // Track direction
+                    
+                    // Animate arrow movement
+                    animateArrowMovement(arrow);
+                } else if (!arrow.moving) {
+                    // Second click - return arrow to original position
+                    arrow.moving = true;
+                    arrow.targetX = arrow.originalX;
+                    arrow.direction = 'backward'; // Track direction
+                    
+                    // Animate arrow movement back
+                    animateArrowMovement(arrow);
+                }
+            }
+            
+            // Animate arrow movement
+            function animateArrowMovement(arrow) {
+                const moveSpeed = 5;
+                function moveArrow() {
+                    if (arrow.moving) {
+                        if (arrow.direction === 'forward' && arrow.x > arrow.targetX) {
+                            // Moving forward towards circle
+                            arrow.x -= moveSpeed;
+                            if (arrow.x <= arrow.targetX) {
+                                arrow.x = arrow.targetX;
+                                arrow.moving = false;
+                                // Change circle color when arrow hits
+                                changeCircleColor(arrow.circleIndex);
+                                // Create particle effect
+                                createParticleEffect(circles[arrow.circleIndex]);
+                                // Play sound effect
+                                playSound('hit');
+                            }
+                            draw();
+                            requestAnimationFrame(moveArrow);
+                        } else if (arrow.direction === 'backward' && arrow.x < arrow.targetX) {
+                            // Moving backward to original position
+                            arrow.x += moveSpeed;
+                            if (arrow.x >= arrow.targetX) {
+                                arrow.x = arrow.targetX;
+                                arrow.moving = false;
+                                // Reset circle when arrow returns
+                                resetCircle(arrow.circleIndex);
+                                // Play sound effect
+                                playSound('return');
+                            }
+                            draw();
+                            requestAnimationFrame(moveArrow);
+                        }
+                    }
+                }
+                moveArrow();
+            }
+            
+            // Change circle color
+            function changeCircleColor(circleIndex) {
+                const circle = circles[circleIndex];
+                const colors = ['#FF69B4', '#00CED1', '#FFB347', '#98FB98', '#DDA0DD', '#F0E68C'];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                circle.color = randomColor;
+                
+                // Start pulsing effect
+                circle.pulsing = true;
+                circle.pulseValue = 0;
+                animateCirclePulse(circle);
+                
+                draw();
+            }
+            
+            // Animate circle pulsing
+            function animateCirclePulse(circle) {
+                if (circle.pulsing) {
+                    circle.pulseValue += 0.1;
+                    
+                    // Calculate pulse effect (sine wave)
+                    const pulseFactor = Math.sin(circle.pulseValue) * 0.2 + 1;
+                    circle.radius = circle.originalRadius * pulseFactor;
+                    
+                    // Stop pulsing after a few cycles
+                    if (circle.pulseValue >= Math.PI * 4) { // 2 full cycles
+                        circle.pulsing = false;
+                        circle.radius = circle.originalRadius;
+                    }
+                    
+                    draw();
+                    
+                    if (circle.pulsing) {
+                        requestAnimationFrame(() => animateCirclePulse(circle));
+                    }
+                }
+            }
+            
+            // Reset circle to original state
+            function resetCircle(circleIndex) {
+                const circle = circles[circleIndex];
+                circle.color = circle.originalColor;
+                circle.clicked = false;
+                circle.pulsing = false;
+                circle.radius = circle.originalRadius;
+                draw();
+            }
+            
+            function createParticleEffect(circle) {
+                // Create particles around the circle
+                for (let i = 0; i < 15; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 1 + Math.random() * 3;
+                    const size = 2 + Math.random() * 5;
+                    
+                    particles.push({
+                        x: circle.x,
+                        y: circle.y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        color: circle.color,
+                        size: size,
+                        life: 30 + Math.random() * 20
+                    });
+                }
+                
+                // Start animating particles
+                if (!animatingParticles) {
+                    animatingParticles = true;
+                    animateParticles();
+                }
+            }
+            
+            let animatingParticles = false;
+            
+            function animateParticles() {
+                // Update and draw particles
+                particles.forEach((particle, index) => {
+                    particle.x += particle.vx;
+                    particle.y += particle.vy;
+                    particle.life--;
+                    
+                    if (particle.life <= 0) {
+                        particles.splice(index, 1);
+                    }
+                });
+                
+                // Continue animation if particles exist
+                if (particles.length > 0) {
+                    draw();
+                    requestAnimationFrame(animateParticles);
+                } else {
+                    animatingParticles = false;
+                }
+            }
+            
+            // Sound effects
+            function playSound(type) {
+                // Create audio context if needed
+                if (!window.AudioContext && !window.webkitAudioContext) {
+                    return; // Browser doesn't support Web Audio API
+                }
+                
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                const audioCtx = new AudioContext();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                // Set sound parameters based on type
+                if (type === 'hit') {
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // A4 note
+                    oscillator.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1); // Up to A5
+                    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    oscillator.start();
+                    oscillator.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'return') {
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note
+                    oscillator.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.1); // Down to A4
+                    gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                    oscillator.start();
+                    oscillator.stop(audioCtx.currentTime + 0.2);
+                }
+            }
+            
+            // Reset function
+            resetBtn.addEventListener('click', function() {
+                // Reset circles
+                circles.forEach(circle => {
+                    circle.color = circle.originalColor;
+                    circle.clicked = false;
+                    circle.pulsing = false;
+                    circle.radius = circle.originalRadius;
+                });
+                
+                // Reset arrows
+                updateArrows();
+                
+                // Clear particles
+                particles = [];
+                animatingParticles = false;
+                
+                // Play reset sound
+                playSound('return');
+                
+                draw();
+            });
+            
+            // Initial draw
+            draw();
+        });
+    </script>
+</body>
+</html>

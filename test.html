@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Bubbles Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+        }
+        
+        .container {
+            width: 600px;
+            height: 400px;
+            border: 2px solid #333;
+            position: relative;
+            background: white;
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        button {
+            margin-top: 10px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Simple Bubbles Test</h1>
+        <div class="container">
+            <canvas id="canvas"></canvas>
+        </div>
+        <button id="resetBtn">Reset</button>
+    </div>
+
+    <script>
+        // Wait for the DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM fully loaded');
+            
+            // Get canvas element and context
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const resetBtn = document.getElementById('resetBtn');
+            
+            console.log('Canvas:', canvas);
+            console.log('Context:', ctx);
+            
+            // Set canvas dimensions
+            function resizeCanvas() {
+                const container = canvas.parentElement;
+                canvas.width = container.clientWidth;
+                canvas.height = container.clientHeight;
+                console.log('Canvas resized to:', canvas.width, 'x', canvas.height);
+                draw();
+            }
+            
+            // Call resize initially and on window resize
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Define circles
+            const circles = [
+                { x: 80, y: 80, radius: 30, color: '#FFD700', originalColor: '#FFD700', clicked: false },
+                { x: 80, y: 150, radius: 30, color: '#4169E1', originalColor: '#4169E1', clicked: false },
+                { x: 80, y: 220, radius: 30, color: '#DC143C', originalColor: '#DC143C', clicked: false },
+                { x: 80, y: 290, radius: 30, color: '#32CD32', originalColor: '#32CD32', clicked: false }
+            ];
+            
+            // Define arrows
+            const arrows = [
+                { x: canvas.width - 150, y: 80, targetX: canvas.width - 150, originalX: canvas.width - 150, moving: false, circleIndex: 0 },
+                { x: canvas.width - 150, y: 150, targetX: canvas.width - 150, originalX: canvas.width - 150, moving: false, circleIndex: 1 },
+                { x: canvas.width - 150, y: 220, targetX: canvas.width - 150, originalX: canvas.width - 150, moving: false, circleIndex: 2 },
+                { x: canvas.width - 150, y: 290, targetX: canvas.width - 150, originalX: canvas.width - 150, moving: false, circleIndex: 3 }
+            ];
+            
+            // Draw function
+            function draw() {
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                console.log('Drawing on canvas:', canvas.width, 'x', canvas.height);
+                
+                // Draw circles
+                circles.forEach(circle => {
+                    drawCircle(circle.x, circle.y, circle.radius, circle.color);
+                });
+                
+                // Draw arrows
+                arrows.forEach(arrow => {
+                    drawArrow(arrow.x, arrow.y);
+                });
+            }
+            
+            // Draw circle
+            function drawCircle(x, y, radius, color) {
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, 2 * Math.PI);
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            
+            // Draw arrow
+            function drawArrow(x, y) {
+                const arrowLength = 40;
+                const arrowHeadSize = 12;
+                
+                // Arrow line
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x - arrowLength, y);
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                
+                // Arrow head
+                ctx.beginPath();
+                ctx.moveTo(x - arrowLength, y);
+                ctx.lineTo(x - arrowLength + arrowHeadSize, y - arrowHeadSize/2);
+                ctx.lineTo(x - arrowLength + arrowHeadSize, y + arrowHeadSize/2);
+                ctx.closePath();
+                ctx.fillStyle = '#333';
+                ctx.fill();
+            }
+            
+            // Handle canvas click
+            canvas.addEventListener('click', function(e) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Check if click is on any circle
+                circles.forEach((circle, index) => {
+                    const distance = Math.sqrt((x - circle.x) ** 2 + (y - circle.y) ** 2);
+                    if (distance <= circle.radius) {
+                        handleCircleClick(index);
+                    }
+                });
+            });
+            
+            // Handle circle click
+            function handleCircleClick(circleIndex) {
+                const circle = circles[circleIndex];
+                const arrow = arrows[circleIndex];
+                
+                if (!circle.clicked) {
+                    // First click - start arrow movement
+                    circle.clicked = true;
+                    arrow.moving = true;
+                    arrow.targetX = circle.x + circle.radius + 20; // Move arrow towards circle
+                    
+                    // Animate arrow movement
+                    animateArrowMovement(arrow);
+                }
+            }
+            
+            // Animate arrow movement
+            function animateArrowMovement(arrow) {
+                const moveSpeed = 5;
+                const moveArrow = () => {
+                    if (arrow.moving && arrow.x > arrow.targetX) {
+                        arrow.x -= moveSpeed;
+                        if (arrow.x <= arrow.targetX) {
+                            arrow.x = arrow.targetX;
+                            arrow.moving = false;
+                            // Change circle color when arrow hits
+                            changeCircleColor(arrow.circleIndex);
+                        }
+                        draw();
+                        requestAnimationFrame(moveArrow);
+                    }
+                };
+                moveArrow();
+            }
+            
+            // Change circle color
+            function changeCircleColor(circleIndex) {
+                const circle = circles[circleIndex];
+                const colors = ['#FF69B4', '#00CED1', '#FFB347', '#98FB98', '#DDA0DD', '#F0E68C'];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                circle.color = randomColor;
+                draw();
+            }
+            
+            // Reset function
+            resetBtn.addEventListener('click', function() {
+                // Reset circles
+                circles.forEach(circle => {
+                    circle.color = circle.originalColor;
+                    circle.clicked = false;
+                });
+                
+                // Reset arrows
+                arrows.forEach(arrow => {
+                    arrow.x = arrow.originalX;
+                    arrow.targetX = arrow.originalX;
+                    arrow.moving = false;
+                });
+                
+                draw();
+            });
+            
+            // Initial draw
+            draw();
+        });
+    </script>
+</body>
+</html>
