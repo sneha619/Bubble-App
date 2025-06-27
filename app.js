@@ -427,9 +427,9 @@ class EnhancedBubblesApp {
       const distance = Math.sqrt(Math.pow(x - circle.x, 2) + Math.pow(y - circle.y, 2))
 
       if (distance <= circle.radius && !circle.clicked) {
-        // Start arrow movement toward the circle
+        // Start arrow movement toward the circle from right to left
         this.arrows[index].moving = true
-        this.arrows[index].targetX = circle.x + circle.radius + 20
+        this.arrows[index].targetX = circle.x - circle.radius - 20  // Move to the right of the circle
         circle.clicked = true
       }
     })
@@ -442,8 +442,8 @@ class EnhancedBubblesApp {
         const dx = arrow.targetX - arrow.x
 
         if (Math.abs(dx) > speed) {
-          // Move arrow toward target
-          arrow.x += dx > 0 ? -speed : speed
+          // Move arrow toward target (right to left)
+          arrow.x += dx > 0 ? speed : -speed
         } else {
           // Arrow has reached the circle
           arrow.x = arrow.targetX
