@@ -189,11 +189,12 @@
             let arrows = [];
             
             function updateArrows() {
+                const arrowX = canvas.width - 50; // 50px from right edge
                 arrows = [
-                    { x: circles[0].x + circles[0].radius + 30, y: circles[0].y, targetX: circles[0].x + circles[0].radius + 30, originalX: circles[0].x + circles[0].radius + 30, moving: false, circleIndex: 0, direction: 1 },
-                    { x: circles[1].x + circles[1].radius + 30, y: circles[1].y, targetX: circles[1].x + circles[1].radius + 30, originalX: circles[1].x + circles[1].radius + 30, moving: false, circleIndex: 1, direction: 1 },
-                    { x: circles[2].x + circles[2].radius + 30, y: circles[2].y, targetX: circles[2].x + circles[2].radius + 30, originalX: circles[2].x + circles[2].radius + 30, moving: false, circleIndex: 2, direction: 1 },
-                    { x: circles[3].x + circles[3].radius + 30, y: circles[3].y, targetX: circles[3].x + circles[3].radius + 30, originalX: circles[3].x + circles[3].radius + 30, moving: false, circleIndex: 3, direction: 1 }
+                    { x: arrowX, y: circles[0].y, targetX: arrowX, originalX: arrowX, moving: false, circleIndex: 0, direction: -1 },
+                    { x: arrowX, y: circles[1].y, targetX: arrowX, originalX: arrowX, moving: false, circleIndex: 1, direction: -1 },
+                    { x: arrowX, y: circles[2].y, targetX: arrowX, originalX: arrowX, moving: false, circleIndex: 2, direction: -1 },
+                    { x: arrowX, y: circles[3].y, targetX: arrowX, originalX: arrowX, moving: false, circleIndex: 3, direction: -1 }
                 ];
             }
             

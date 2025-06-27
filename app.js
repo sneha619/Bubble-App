@@ -15,9 +15,12 @@ class EnhancedBubblesApp {
     this.clickCountEl = document.getElementById("clickCount")
     this.poppedCountEl = document.getElementById("poppedCount")
 
-    // Set canvas size
+    // Set canvas size and initialize renderer
     this.resizeCanvas()
     window.addEventListener("resize", () => this.resizeCanvas())
+    
+    // Initialize renderer with right-positioned arrows
+    this.renderer = new window.Renderer(this.canvas, this.ctx)
 
     // Circle properties - positioned on left side
     this.circles = [
