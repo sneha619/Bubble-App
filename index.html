@@ -238,26 +238,28 @@
                 ctx.stroke();
             }
             
-            // Draw arrow (previous arrow symbol ←)
+            // Draw arrow (solid black arrow pointing left)
             function drawArrow(x, y) {
-                const arrowSize = 30; // Increased size of the arrow symbol
+                const arrowLength = 50;
+                const arrowHeadSize = 15;
                 
-                // Set text properties
-                ctx.font = `bold ${arrowSize}px Arial`;
-                ctx.fillStyle = '#000'; // Darker color for better visibility
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                
-                // Draw the arrow symbol (←)
-                ctx.fillText('←', x, y);
-                
-                // Add a thicker line
+                // Draw arrow shaft (pointing left)
                 ctx.beginPath();
-                ctx.moveTo(x + 15, y);
-                ctx.lineTo(x - 15, y);
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 3; // Thicker line
+                ctx.moveTo(x, y);
+                ctx.lineTo(x - arrowLength, y);
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 4;
+                ctx.lineCap = 'round';
                 ctx.stroke();
+                
+                // Draw arrow head (pointing left)
+                ctx.beginPath();
+                ctx.moveTo(x - arrowLength, y);
+                ctx.lineTo(x - arrowLength + arrowHeadSize, y - arrowHeadSize / 2);
+                ctx.lineTo(x - arrowLength + arrowHeadSize, y + arrowHeadSize / 2);
+                ctx.closePath();
+                ctx.fillStyle = '#000000';
+                ctx.fill();
             }
             
             // Draw particle
