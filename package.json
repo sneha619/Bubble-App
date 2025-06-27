@@ -4,6 +4,6 @@
   },
   "scripts": {
     "dev": "parcel index.html",
-    "build": "parcel build index.html --public-url ./"
+    "build": "echo \"No build step needed\""
   }
 }

@@ -168,8 +168,21 @@
                 const container = canvas.parentElement;
                 canvas.width = container.clientWidth;
                 canvas.height = container.clientHeight;
-                // Only call draw if all required arrays are defined
+                
+                // Only update if all required arrays are defined
                 if (typeof circles !== 'undefined' && typeof arrows !== 'undefined' && typeof particles !== 'undefined') {
+                    // Update arrow positions relative to new canvas width
+                    const arrowX = canvas.width - 50;
+                    arrows.forEach(arrow => {
+                        if (!arrow.moving) {
+                            arrow.x = arrowX;
+                            arrow.targetX = arrowX;
+                            arrow.originalX = arrowX;
+                        } else if (arrow.direction === 'backward') {
+                            arrow.targetX = arrowX;
+                            arrow.originalX = arrowX;
+                        }
+                    });
                     draw();
                 }
             }
@@ -310,7 +323,7 @@
                     // First click - start arrow movement
                     circle.clicked = true;
                     arrow.moving = true;
-                    arrow.targetX = circle.x + circle.radius; // Move arrow to the rightmost point of the circle
+                    arrow.targetX = circle.x + circle.radius + 20; // Move arrow near the circle
                     arrow.direction = 'forward'; // Track direction
                     
                     // Animate arrow movement
@@ -320,6 +333,7 @@
                     arrow.moving = true;
                     arrow.targetX = arrow.originalX;
                     arrow.direction = 'backward'; // Track direction
+                    circle.clicked = false; // Reset circle state
                     
                     // Animate arrow movement back
                     animateArrowMovement(arrow);
@@ -332,7 +346,7 @@
                 function moveArrow() {
                     if (arrow.moving) {
                         if (arrow.direction === 'forward' && arrow.x > arrow.targetX) {
-                            // Moving forward towards circle
+                            // Moving left towards circle
                             arrow.x -= moveSpeed;
                             if (arrow.x <= arrow.targetX) {
                                 arrow.x = arrow.targetX;
@@ -347,7 +361,7 @@
                             draw();
                             requestAnimationFrame(moveArrow);
                         } else if (arrow.direction === 'backward' && arrow.x < arrow.targetX) {
-                            // Moving backward to original position
+                            // Moving right back to original position
                             arrow.x += moveSpeed;
                             if (arrow.x >= arrow.targetX) {
                                 arrow.x = arrow.targetX;

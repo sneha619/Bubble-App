@@ -1,25 +1,563 @@
-<!DOCTYPE html><html lang=en><meta charset=UTF-8><meta name=viewport content="width=device-width, initial-scale=1.0"><title>Bubbles App</title><link rel=icon href=favicon.38d394c2.ico type=image/x-icon><style>body{background-color:#f0f0f0;justify-content:center;align-items:center;min-height:100vh;margin:0;padding:20px;font-family:Arial,sans-serif;display:flex}.browser-window{background:#e0e0e0;border-radius:8px;width:90vw;max-width:800px;min-height:600px;box-shadow:0 4px 20px #0003}.browser-header{background:#d0d0d0;border-bottom:1px solid #bbb;border-radius:8px 8px 0 0;align-items:center;gap:10px;padding:10px 15px;display:flex}.browser-buttons{gap:5px;display:flex}.browser-button{border:1px solid #999;border-radius:50%;width:12px;height:12px}.close{background:#ff5f57}.minimize{background:#ffbd2e}.maximize{background:#28ca42}.address-bar{color:#666;background:#fff;border:1px solid #999;border-radius:3px;flex:1;margin:0 10px;padding:4px 8px;font-size:12px}.browser-content{text-align:center;background:#fff;min-height:500px;padding:20px}h1{color:#333;margin:0 0 30px;font-size:24px}.app-container{background:#fff;border:2px solid #333;width:90%;max-width:600px;height:400px;margin:0 auto 20px;position:relative}canvas{box-sizing:border-box;width:100%;height:100%;display:block}.reset-button{cursor:pointer;background:#f0f0f0;border:2px solid #999;border-radius:4px;padding:8px 16px;font-size:14px;position:absolute;bottom:10px;right:10px}.reset-button:hover{background:#e0e0e0}.reset-button:active{background:#d0d0d0}.nav-button,.search-button{color:#666;font-size:12px}@media (width<=768px){body{padding:10px}.browser-window{width:95vw}.app-container{height:300px}}</style><body>
-    <div class=browser-window>
-        <div class=browser-header>
-            <div class=browser-buttons>
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bubbles App</title>
+    <link rel="icon" href="/favicon.7155ca86.ico" type="image/x-icon">
+    <style>body {
+  background-color: #f0f0f0;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  display: flex;
+}
+
+.browser-window {
+  background: #e0e0e0;
+  border-radius: 8px;
+  width: 90vw;
+  max-width: 800px;
+  min-height: 600px;
+  box-shadow: 0 4px 20px #0003;
+}
+
+.browser-header {
+  background: #d0d0d0;
+  border-bottom: 1px solid #bbb;
+  border-radius: 8px 8px 0 0;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  display: flex;
+}
+
+.browser-buttons {
+  gap: 5px;
+  display: flex;
+}
+
+.browser-button {
+  border: 1px solid #999;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+}
+
+.close {
+  background: #ff5f57;
+}
+
+.minimize {
+  background: #ffbd2e;
+}
+
+.maximize {
+  background: #28ca42;
+}
+
+.address-bar {
+  color: #666;
+  background: #fff;
+  border: 1px solid #999;
+  border-radius: 3px;
+  flex: 1;
+  margin: 0 10px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.browser-content {
+  text-align: center;
+  background: #fff;
+  min-height: 500px;
+  padding: 20px;
+}
+
+h1 {
+  color: #333;
+  margin: 0 0 30px;
+  font-size: 24px;
+}
+
+.app-container {
+  background: #fff;
+  border: 2px solid #333;
+  width: 90%;
+  max-width: 600px;
+  height: 400px;
+  margin: 0 auto 20px;
+  position: relative;
+}
+
+canvas {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.reset-button {
+  cursor: pointer;
+  background: #f0f0f0;
+  border: 2px solid #999;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+.reset-button:hover {
+  background: #e0e0e0;
+}
+
+.reset-button:active {
+  background: #d0d0d0;
+}
+
+.nav-button, .search-button {
+  color: #666;
+  font-size: 12px;
+}
+
+@media (width <= 768px) {
+  body {
+    padding: 10px;
+  }
+
+  .browser-window {
+    width: 95vw;
+  }
+
+  .app-container {
+    height: 300px;
+  }
+}
+</style>
+</head>
+<body>
+    <div class="browser-window">
+        <div class="browser-header">
+            <div class="browser-buttons">
                 <div class="browser-button close"></div>
                 <div class="browser-button minimize"></div>
                 <div class="browser-button maximize"></div>
             </div>
-            <div class=nav-button>🏠</div>
-            <input class=address-bar value=https://localhost:80 readonly>
-            <div class=search-button>🔍</div>
+            <div class="nav-button">🏠</div>
+            <input type="text" class="address-bar" value="https://localhost:80" readonly="">
+            <div class="search-button">🔍</div>
         </div>
         
-        <div class=browser-content>
+        <div class="browser-content">
             <h1>Bubbles App</h1>
-            <div class=app-container>
-                <canvas id=bubblesCanvas></canvas>
-                <button class=reset-button id=resetBtn>Reset</button>
+            <div class="app-container">
+                <canvas id="bubblesCanvas"></canvas>
+                <button class="reset-button" id="resetBtn">Reset</button>
             </div>
         </div>
     </div>
 
-    <script>document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("bubblesCanvas"),i=e.getContext("2d"),t=document.getElementById("resetBtn");function n(){let i=e.parentElement;e.width=i.clientWidth,e.height=i.clientHeight,void 0!==o&&void 0!==r&&void 0!==a&&c()}window.addEventListener("resize",n);let o=[{x:80,y:80,radius:30,originalRadius:30,color:"#FFD700",originalColor:"#FFD700",clicked:!1,pulsing:!1,pulseValue:0},{x:80,y:150,radius:30,originalRadius:30,color:"#4169E1",originalColor:"#4169E1",clicked:!1,pulsing:!1,pulseValue:0},{x:80,y:220,radius:30,originalRadius:30,color:"#DC143C",originalColor:"#DC143C",clicked:!1,pulsing:!1,pulseValue:0},{x:80,y:290,radius:30,originalRadius:30,color:"#32CD32",originalColor:"#32CD32",clicked:!1,pulsing:!1,pulseValue:0}],r=[];function l(){let i=e.width-50;r=[{x:i,y:o[0].y,targetX:i,originalX:i,moving:!1,circleIndex:0,direction:-1},{x:i,y:o[1].y,targetX:i,originalX:i,moving:!1,circleIndex:1,direction:-1},{x:i,y:o[2].y,targetX:i,originalX:i,moving:!1,circleIndex:2,direction:-1},{x:i,y:o[3].y,targetX:i,originalX:i,moving:!1,circleIndex:3,direction:-1}]}let a=[];function c(){i.clearRect(0,0,e.width,e.height),o.forEach(e=>{var t,n,o,r;t=e.x,n=e.y,o=e.radius,r=e.color,i.beginPath(),i.arc(t,n,o,0,2*Math.PI),i.fillStyle=r,i.fill(),i.strokeStyle="#333",i.lineWidth=2,i.stroke()}),r.forEach(e=>{var t,n;t=e.x,n=e.y,i.beginPath(),i.moveTo(t,n),i.lineTo(t-50,n),i.strokeStyle="#000000",i.lineWidth=4,i.lineCap="round",i.stroke(),i.beginPath(),i.moveTo(t-50,n),i.lineTo(t-50+15,n-7.5),i.lineTo(t-50+15,n+7.5),i.closePath(),i.fillStyle="#000000",i.fill()}),a.forEach(e=>{var t;t=e,i.beginPath(),i.arc(t.x,t.y,t.size,0,2*Math.PI),i.fillStyle=t.color,i.globalAlpha=t.life/50,i.fill(),i.globalAlpha=1})}function u(e){!function i(){e.moving&&("forward"===e.direction&&e.x>e.targetX?(e.x-=5,e.x<=e.targetX&&(e.x=e.targetX,e.moving=!1,function(e){let i=o[e],t=["#FF69B4","#00CED1","#FFB347","#98FB98","#DDA0DD","#F0E68C"];i.color=t[Math.floor(Math.random()*t.length)],i.pulsing=!0,i.pulseValue=0,function e(i){if(i.pulsing){i.pulseValue+=.1;let t=.2*Math.sin(i.pulseValue)+1;i.radius=i.originalRadius*t,i.pulseValue>=4*Math.PI&&(i.pulsing=!1,i.radius=i.originalRadius),c(),i.pulsing&&requestAnimationFrame(()=>e(i))}}(i),c()}(e.circleIndex),function(e){for(let i=0;i<15;i++){let i=Math.random()*Math.PI*2,t=1+3*Math.random(),n=2+5*Math.random();a.push({x:e.x,y:e.y,vx:Math.cos(i)*t,vy:Math.sin(i)*t,color:e.color,size:n,life:30+20*Math.random()})}d||(d=!0,function e(){a.forEach((e,i)=>{e.x+=e.vx,e.y+=e.vy,e.life--,e.life<=0&&a.splice(i,1)}),a.length>0?(c(),requestAnimationFrame(e)):d=!1}())}(o[e.circleIndex]),s("hit")),c(),requestAnimationFrame(i)):"backward"===e.direction&&e.x<e.targetX&&(e.x+=5,e.x>=e.targetX&&(e.x=e.targetX,e.moving=!1,function(e){let i=o[e];i.color=i.originalColor,i.clicked=!1,i.pulsing=!1,i.radius=i.originalRadius,c()}(e.circleIndex),s("return")),c(),requestAnimationFrame(i)))}()}l(),n(),e.addEventListener("click",function(i){let t=e.getBoundingClientRect(),n=i.clientX-t.left,l=i.clientY-t.top,a=!1;for(let e=0;e<o.length;e++){let i=o[e];if(Math.sqrt((n-i.x)**2+(l-i.y)**2)<=i.radius){(function(e){let i=o[e],t=r[e];i.clicked?t.moving||(t.moving=!0,t.targetX=t.originalX,t.direction="backward",u(t)):(i.clicked=!0,t.moving=!0,t.targetX=i.x+i.radius,t.direction="forward",u(t))})(e),a=!0;break}}return a});let d=!1;function s(e){if(!window.AudioContext&&!window.webkitAudioContext)return;let i=new(window.AudioContext||window.webkitAudioContext),t=i.createOscillator(),n=i.createGain();t.connect(n),n.connect(i.destination),"hit"===e?(t.type="sine",t.frequency.setValueAtTime(440,i.currentTime),t.frequency.exponentialRampToValueAtTime(880,i.currentTime+.1),n.gain.setValueAtTime(.3,i.currentTime),n.gain.exponentialRampToValueAtTime(.01,i.currentTime+.3),t.start(),t.stop(i.currentTime+.3)):"return"===e&&(t.type="sine",t.frequency.setValueAtTime(880,i.currentTime),t.frequency.exponentialRampToValueAtTime(440,i.currentTime+.1),n.gain.setValueAtTime(.2,i.currentTime),n.gain.exponentialRampToValueAtTime(.01,i.currentTime+.2),t.start(),t.stop(i.currentTime+.2))}t.addEventListener("click",function(){o.forEach(e=>{e.color=e.originalColor,e.clicked=!1,e.pulsing=!1,e.radius=e.originalRadius}),l(),a=[],d=!1,s("return"),c()}),c()});</script>
+    <script>// Wait for the DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Get canvas element and context
+    const canvas = document.getElementById('bubblesCanvas');
+    const ctx = canvas.getContext('2d');
+    const resetBtn = document.getElementById('resetBtn');
+    // Set canvas dimensions
+    function resizeCanvas() {
+        const container = canvas.parentElement;
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+        // Only update if all required arrays are defined
+        if (typeof circles !== 'undefined' && typeof arrows !== 'undefined' && typeof particles !== 'undefined') {
+            // Update arrow positions relative to new canvas width
+            const arrowX = canvas.width - 50;
+            arrows.forEach((arrow)=>{
+                if (!arrow.moving) {
+                    arrow.x = arrowX;
+                    arrow.targetX = arrowX;
+                    arrow.originalX = arrowX;
+                } else if (arrow.direction === 'backward') {
+                    arrow.targetX = arrowX;
+                    arrow.originalX = arrowX;
+                }
+            });
+            draw();
+        }
+    }
+    // Add resize event listener
+    window.addEventListener('resize', resizeCanvas);
+    // Define circles
+    const circles = [
+        {
+            x: 80,
+            y: 80,
+            radius: 30,
+            originalRadius: 30,
+            color: '#FFD700',
+            originalColor: '#FFD700',
+            clicked: false,
+            pulsing: false,
+            pulseValue: 0
+        },
+        {
+            x: 80,
+            y: 150,
+            radius: 30,
+            originalRadius: 30,
+            color: '#4169E1',
+            originalColor: '#4169E1',
+            clicked: false,
+            pulsing: false,
+            pulseValue: 0
+        },
+        {
+            x: 80,
+            y: 220,
+            radius: 30,
+            originalRadius: 30,
+            color: '#DC143C',
+            originalColor: '#DC143C',
+            clicked: false,
+            pulsing: false,
+            pulseValue: 0
+        },
+        {
+            x: 80,
+            y: 290,
+            radius: 30,
+            originalRadius: 30,
+            color: '#32CD32',
+            originalColor: '#32CD32',
+            clicked: false,
+            pulsing: false,
+            pulseValue: 0
+        }
+    ];
+    // Define arrows
+    let arrows = [];
+    function updateArrows() {
+        const arrowX = canvas.width - 50; // 50px from right edge
+        arrows = [
+            {
+                x: arrowX,
+                y: circles[0].y,
+                targetX: arrowX,
+                originalX: arrowX,
+                moving: false,
+                circleIndex: 0,
+                direction: -1
+            },
+            {
+                x: arrowX,
+                y: circles[1].y,
+                targetX: arrowX,
+                originalX: arrowX,
+                moving: false,
+                circleIndex: 1,
+                direction: -1
+            },
+            {
+                x: arrowX,
+                y: circles[2].y,
+                targetX: arrowX,
+                originalX: arrowX,
+                moving: false,
+                circleIndex: 2,
+                direction: -1
+            },
+            {
+                x: arrowX,
+                y: circles[3].y,
+                targetX: arrowX,
+                originalX: arrowX,
+                moving: false,
+                circleIndex: 3,
+                direction: -1
+            }
+        ];
+    }
+    // Particle effect system
+    let particles = [];
+    updateArrows();
+    // Call resize initially after arrays are defined
+    resizeCanvas();
+    // Draw function
+    function draw() {
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Draw circles
+        circles.forEach((circle)=>{
+            drawCircle(circle.x, circle.y, circle.radius, circle.color);
+        });
+        // Draw arrows
+        arrows.forEach((arrow)=>{
+            drawArrow(arrow.x, arrow.y);
+        });
+        // Draw particles
+        particles.forEach((particle)=>{
+            drawParticle(particle);
+        });
+    }
+    // Draw circle
+    function drawCircle(x, y, radius, color) {
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
+    // Draw arrow (solid black arrow pointing left)
+    function drawArrow(x, y) {
+        const arrowLength = 50;
+        const arrowHeadSize = 15;
+        // Draw arrow shaft (pointing left)
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x - arrowLength, y);
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+        // Draw arrow head (pointing left)
+        ctx.beginPath();
+        ctx.moveTo(x - arrowLength, y);
+        ctx.lineTo(x - arrowLength + arrowHeadSize, y - arrowHeadSize / 2);
+        ctx.lineTo(x - arrowLength + arrowHeadSize, y + arrowHeadSize / 2);
+        ctx.closePath();
+        ctx.fillStyle = '#000000';
+        ctx.fill();
+    }
+    // Draw particle
+    function drawParticle(particle) {
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size, 0, 2 * Math.PI);
+        ctx.fillStyle = particle.color;
+        ctx.globalAlpha = particle.life / 50; // Fade out as life decreases
+        ctx.fill();
+        ctx.globalAlpha = 1.0; // Reset alpha
+    }
+    // Handle canvas click with event delegation
+    function handleCanvasClick(e) {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        // Check if click is on any interactive element
+        let elementClicked = false;
+        // Check if click is on any circle
+        for(let i = 0; i < circles.length; i++){
+            const circle = circles[i];
+            const distance = Math.sqrt((x - circle.x) ** 2 + (y - circle.y) ** 2);
+            if (distance <= circle.radius) {
+                handleCircleClick(i);
+                elementClicked = true;
+                break; // Only handle one click at a time
+            }
+        }
+        // Check if click is on reset button (if needed)
+        // This is handled separately by the button's own event listener
+        return elementClicked;
+    }
+    // Add single event listener for all canvas interactions
+    canvas.addEventListener('click', handleCanvasClick);
+    // Handle circle click
+    function handleCircleClick(circleIndex) {
+        const circle = circles[circleIndex];
+        const arrow = arrows[circleIndex];
+        if (!circle.clicked) {
+            // First click - start arrow movement
+            circle.clicked = true;
+            arrow.moving = true;
+            arrow.targetX = circle.x + circle.radius + 20; // Move arrow near the circle
+            arrow.direction = 'forward'; // Track direction
+            // Animate arrow movement
+            animateArrowMovement(arrow);
+        } else if (!arrow.moving) {
+            // Second click - return arrow to original position
+            arrow.moving = true;
+            arrow.targetX = arrow.originalX;
+            arrow.direction = 'backward'; // Track direction
+            circle.clicked = false; // Reset circle state
+            // Animate arrow movement back
+            animateArrowMovement(arrow);
+        }
+    }
+    // Animate arrow movement
+    function animateArrowMovement(arrow) {
+        const moveSpeed = 5;
+        function moveArrow() {
+            if (arrow.moving) {
+                if (arrow.direction === 'forward' && arrow.x > arrow.targetX) {
+                    // Moving left towards circle
+                    arrow.x -= moveSpeed;
+                    if (arrow.x <= arrow.targetX) {
+                        arrow.x = arrow.targetX;
+                        arrow.moving = false;
+                        // Change circle color when arrow hits
+                        changeCircleColor(arrow.circleIndex);
+                        // Create particle effect
+                        createParticleEffect(circles[arrow.circleIndex]);
+                        // Play sound effect
+                        playSound('hit');
+                    }
+                    draw();
+                    requestAnimationFrame(moveArrow);
+                } else if (arrow.direction === 'backward' && arrow.x < arrow.targetX) {
+                    // Moving right back to original position
+                    arrow.x += moveSpeed;
+                    if (arrow.x >= arrow.targetX) {
+                        arrow.x = arrow.targetX;
+                        arrow.moving = false;
+                        // Reset circle when arrow returns
+                        resetCircle(arrow.circleIndex);
+                        // Play sound effect
+                        playSound('return');
+                    }
+                    draw();
+                    requestAnimationFrame(moveArrow);
+                }
+            }
+        }
+        moveArrow();
+    }
+    // Change circle color
+    function changeCircleColor(circleIndex) {
+        const circle = circles[circleIndex];
+        const colors = [
+            '#FF69B4',
+            '#00CED1',
+            '#FFB347',
+            '#98FB98',
+            '#DDA0DD',
+            '#F0E68C'
+        ];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        circle.color = randomColor;
+        // Start pulsing effect
+        circle.pulsing = true;
+        circle.pulseValue = 0;
+        animateCirclePulse(circle);
+        draw();
+    }
+    // Animate circle pulsing
+    function animateCirclePulse(circle) {
+        if (circle.pulsing) {
+            circle.pulseValue += 0.1;
+            // Calculate pulse effect (sine wave)
+            const pulseFactor = Math.sin(circle.pulseValue) * 0.2 + 1;
+            circle.radius = circle.originalRadius * pulseFactor;
+            // Stop pulsing after a few cycles
+            if (circle.pulseValue >= Math.PI * 4) {
+                circle.pulsing = false;
+                circle.radius = circle.originalRadius;
+            }
+            draw();
+            if (circle.pulsing) requestAnimationFrame(()=>animateCirclePulse(circle));
+        }
+    }
+    // Reset circle to original state
+    function resetCircle(circleIndex) {
+        const circle = circles[circleIndex];
+        circle.color = circle.originalColor;
+        circle.clicked = false;
+        circle.pulsing = false;
+        circle.radius = circle.originalRadius;
+        draw();
+    }
+    function createParticleEffect(circle) {
+        // Create particles around the circle
+        for(let i = 0; i < 15; i++){
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 1 + Math.random() * 3;
+            const size = 2 + Math.random() * 5;
+            particles.push({
+                x: circle.x,
+                y: circle.y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                color: circle.color,
+                size: size,
+                life: 30 + Math.random() * 20
+            });
+        }
+        // Start animating particles
+        if (!animatingParticles) {
+            animatingParticles = true;
+            animateParticles();
+        }
+    }
+    let animatingParticles = false;
+    function animateParticles() {
+        // Update and draw particles
+        particles.forEach((particle, index)=>{
+            particle.x += particle.vx;
+            particle.y += particle.vy;
+            particle.life--;
+            if (particle.life <= 0) particles.splice(index, 1);
+        });
+        // Continue animation if particles exist
+        if (particles.length > 0) {
+            draw();
+            requestAnimationFrame(animateParticles);
+        } else animatingParticles = false;
+    }
+    // Sound effects
+    function playSound(type) {
+        // Create audio context if needed
+        if (!window.AudioContext && !window.webkitAudioContext) return; // Browser doesn't support Web Audio API
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        // Set sound parameters based on type
+        if (type === 'hit') {
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // A4 note
+            oscillator.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1); // Up to A5
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.3);
+        } else if (type === 'return') {
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note
+            oscillator.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.1); // Down to A4
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.2);
+        }
+    }
+    // Reset function
+    resetBtn.addEventListener('click', function() {
+        // Reset circles
+        circles.forEach((circle)=>{
+            circle.color = circle.originalColor;
+            circle.clicked = false;
+            circle.pulsing = false;
+            circle.radius = circle.originalRadius;
+        });
+        // Reset arrows
+        updateArrows();
+        // Clear particles
+        particles = [];
+        animatingParticles = false;
+        // Play reset sound
+        playSound('return');
+        draw();
+    });
+    // Initial draw
+    draw();
+});
+
+</script>
 
 
+<script src="/CanvaJs%20Assignment.3464ddca.js"></script></body></html>
